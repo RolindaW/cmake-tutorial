@@ -37,6 +37,39 @@
 - `<name>` is the logical target name and must be globally unique within a project. Actual file name is constructed based on conventions of the native platform.
 - Source files can be omitted if added later using `target_sources()`.
 
+#### [`set(<variable> <value>... [PARENT_SCOPE])`](https://cmake.org/cmake/help/latest/command/set.html)
+
+- Set/Unset (if no value is given) a variable.
+
+#### [`unset(<variable> [CACHE | PARENT_SCOPE])`](https://cmake.org/cmake/help/latest/command/unset.html)
+
+- Unset a variable.
+
+### Variables
+
+- It is possible to create variables for a project using `set()`.
+- There are some special variables automatically defined by CMake (those starting with `CMAKE_` - avoid this naming convention for custom variable names). May be set before calling `add_executable()` to take effect.
+
+#### [`CMAKE_CXX_STANDARD`](https://cmake.org/cmake/help/latest/variable/CMAKE_CXX_STANDARD.html)
+
+- Default value for `CXX_STANDARD` target property if set when a target is created.
+
+#### [`CMAKE_CXX_STANDARD_REQUIRED`](https://cmake.org/cmake/help/latest/variable/CMAKE_CXX_STANDARD_REQUIRED.html)
+
+- Default value for `CXX_STANDARD_REQUIRED` target property if set when a target is created.
+
+### Properties
+
+TODO
+
+#### [`CXX_STANDARD`](https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD.html)
+
+- The C++ standard whose features are requested to build a target.
+
+#### [`CXX_STANDARD_REQUIRED`](https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD_REQUIRED.html)
+
+- Describe whether the value of `CXX_STANDARD` is a requirement or not.
+
 ### [CMake](https://cmake.org/cmake/help/latest/manual/cmake.1.html)
 
 #### Generate a project build system files
