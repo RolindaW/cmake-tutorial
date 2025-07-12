@@ -27,9 +27,13 @@
 - Set project name (and other project level info e.g. language, version number).
 - Sets `PROJECT_NAME` variable.
 - Sets `CMAKE_PROJECT_NAME` variable when called from top-level `CMakeLists.txt`.
-- Sets other variables too (e.g. `PROJECT_SOURCE_DIR`, `PROJECT_BINARY_DIR`).
+- Sets other variables too (e.g. `PROJECT_SOURCE_DIR`, `PROJECT_BINARY_DIR`). Project build directory and project binary directory are considered interchangable terms.
 - Required with every project.
 - Should be called soon after `cmake_minimum_required()`.
+
+Use `project(<project-name> VERSION <mayor>[.<minor>[.<patch>[.<tweak>]]])` to set version number.
+- CMake will define `<project-name>_VERSION = <mayor>[.<minor>[.<patch>[.<tweak>]]]`
+- and `<project-name>_VERSION_MAJOR = <mayor>`, `<project-name>_VERSION_MINOR = <minor>` (and so on) variables behind the scenes.
 
 #### [`add_executable(<name> <options>... <sources>...)`](https://cmake.org/cmake/help/latest/command/add_executable.html)
 
@@ -44,6 +48,19 @@
 #### [`unset(<variable> [CACHE | PARENT_SCOPE])`](https://cmake.org/cmake/help/latest/command/unset.html)
 
 - Unset a variable.
+
+#### [`configure_file(<input> <output> ...)`](https://cmake.org/cmake/help/latest/command/configure_file.html)
+
+- Copy an `<input>` file to an `<output>` file while performing transformations of the input file content.
+- `<input>` relative path is treated with respect to the value of `CMAKE_CURRENT_SOURCE_DIR`.
+- `<output>` relative path is treated with respect to the value of `CMAKE_CURRENT_BINARY_DIR`.
+- Variables referenced in the input file content as `@VAR@` (and other) will be replaced (empty string if not defined).
+- Use case: make variables defined in `CMakeLists.txt` available in source code (e.g. generated HEADER file).
+
+#### [`target_include_directories(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_include_directories.html)
+
+- Specify where the executable target should look for include files.
+- `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
 
 ### Variables
 
@@ -86,3 +103,4 @@ Using working directory as build tree and specifying source path:
 
 - Call the build system to compile/link the project (and others e.g. run test suite): `cmake --build <build-dir>` (or `cmake --build .` if already in the build directory).
 - Acts as a wrapper around the underlying native build tool, abstracting away the specifics of the chosen build system.
+- Re-runs build system file generation if needed (e.g. source files changed).
