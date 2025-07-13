@@ -133,7 +133,7 @@ Environment: `unset(ENV{<variable>})`
 
 - Specify libraries or flags to use when linking a given target and/or its dependents.
 - `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
-- Corresponding header file source directory must be still specified with `target_include_directories()`.
+- It may still require to specify with `target_include_directories()` the source directory of being linked library header file (e.g. in `Step2` project, including `MathFunctions.h` header file source directory is required when linking `MathFunctions` library to `Tutorial` executable because the latter does not know where `MathFunctions.h` header file is; otherwise, including `mysqrt.h` header file source directory is not required when linking `SqrtLibrary` library to `MathFunctions` library because the latter does already know where `mysqrt.h` header file is).
 
 Note: added as a dependency in target project build system files (VS Build Tools `Link\AdditionalDependencies`).
 
