@@ -1,17 +1,27 @@
 # CMake Tutorial
 
-- [Documentation](https://cmake.org/cmake/help/latest/index.html)
-- [Guide](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
+- [Tutorial](https://cmake.org/cmake/help/latest/guide/tutorial/index.html)
 - [Source code examples](https://github.com/Kitware/CMake/tree/master/Help/guide/tutorial)
+
+## Other references
+
+- [Documentation](https://cmake.org/cmake/help/latest/index.html)
+- [Mastering CMake](https://cmake.org/cmake/help/book/mastering-cmake/index.html)
 
 ## Basics
 
-### `CMakeLists.txt`
+### [`CMakeLists.txt`](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Writing%20CMakeLists%20Files.html)
 
 - CMake input file.
 - Multiple files can be used in a project: top-level and subdirectories.
 - Define build process.
 - Specify commands.
+
+### [`CMakeCache.txt`](https://cmake.org/cmake/help/book/mastering-cmake/chapter/CMake%20Cache.html)
+
+- Cache file containing variables that are set as part of corresponding build (i.e. a project build system file generation).
+- Includes everything found by system introspection, paths to installed software, and flags used for the build.
+- Cmake contains several GUIs to allow editing it.
 
 ### Commands
 
