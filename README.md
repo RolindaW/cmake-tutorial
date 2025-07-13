@@ -25,7 +25,7 @@
 
 ### Commands
 
-#### [`cmake_minimum_required(VERSION <min>[...<policy_max_>])`](https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html)
+#### [`cmake_minimum_required(VERSION <min>[...<policy-max>])`](https://cmake.org/cmake/help/latest/command/cmake_minimum_required.html)
 
 - Specify minimum CMake version and policy settings.
 - Sets `CMAKE_MINIMUM_REQUIRED_VERSION` variable to `<min>`.
@@ -40,16 +40,46 @@
 - Sets other variables too (e.g. `PROJECT_SOURCE_DIR`, `PROJECT_BINARY_DIR`). Project build directory and project binary directory are considered interchangable terms.
 - Required with every project.
 - Should be called soon after `cmake_minimum_required()`.
+- Primarily intended for the top-level `CMakeLists.txt` file of a project. Not recommended to call in subdirectories for typical project structures (use `add_subdirectory()` - on top-level `CMakeLists.txt` file - and `add_executable()`,`add_library()`, `target_include_directories()` - within corresponding subdirectories `CmakeLists.txt` file - instead).
 
 Use `project(<project-name> VERSION <mayor>[.<minor>[.<patch>[.<tweak>]]])` to set version number.
 - CMake will define `<project-name>_VERSION = <mayor>[.<minor>[.<patch>[.<tweak>]]]`
 - and `<project-name>_VERSION_MAJOR = <mayor>`, `<project-name>_VERSION_MINOR = <minor>` (and so on) variables behind the scenes.
 
+TODO: Verify if this is correct.
+Side note:
+- Cmake `project` is the equivalent to VS Build Tools `solution`.
+- Cmake `target` is the equivalent to VS Build Tools `project`.
+
 #### [`add_executable(<name> <options>... <sources>...)`](https://cmake.org/cmake/help/latest/command/add_executable.html)
 
 - Create an executable using specified source code files.
-- `<name>` is the logical target name and must be globally unique within a project. Actual file name is constructed based on conventions of the native platform.
+- `<name>` is the logical target name and must be globally unique within a project. Actual file name is constructed based on conventions of the native platform (e.g. `<name>.exe`).
 - Source files can be omitted if added later using `target_sources()`.
+
+#### [`add_library(<name> [<type>] [EXCLUDE_FROM_ALL] <sources>...)`](https://cmake.org/cmake/help/latest/command/add_library.html)
+
+- Create a library using specified source code files.
+- `<name>` is the logical target name and must be globally unique within a project. Actual file name is constructed based on conventions of the native platform (e.g. `<name>.lib`).
+- `<type>` define the type of library to be created.
+
+Normal libraries:
+  - [`STATIC`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#static-libraries) Static library. Archive of (linked) object files. Use when linking other targets.
+  - [`SHARED`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#shared-libraries) Dynamic library. May be linked by other targets and loaded at runtime.
+  - [`MODULE`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#module-libraries) Plugin. May not be linked by other targets, but may be dynamically loaded at runtime.
+
+Other libraries:
+  - [`OBJECT`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#object-libraries) Compile source files without archiving or linking their object files into a library. Other targets may reference the objects using the expression `$<TARGET_OBJECTS:obj-lib-name>` as source.
+  - [`INTERFACE`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#interface-libraries) 
+  - [`IMPORTED`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets) 
+  - [`ALIAS`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#alias-targets) 
+
+#### [`add_subdirectory(<source-dir> [<binary-dir>] ...)`](https://cmake.org/cmake/help/latest/command/add_subdirectory.html)
+
+- Add a subdirectory to the build.
+- `<source-dir>` directory in which source `CMakeLists.txt` and code files are located. Path may be absolute or relative to the current directory.
+- `<binary-dir>` directory in which to place output files. Path may be absolute or relative to the current output directory. Use `<source-dir>` value (before expanding any relative path) if not specified.
+- `CMakeLists.txt` file in specified `<source-dir>` will be processed immediately before continuing.
 
 #### [`set(<variable> <value>... [PARENT_SCOPE])`](https://cmake.org/cmake/help/latest/command/set.html)
 
@@ -67,10 +97,16 @@ Use `project(<project-name> VERSION <mayor>[.<minor>[.<patch>[.<tweak>]]])` to s
 - Variables referenced in the input file content as `@VAR@` (and other) will be replaced (empty string if not defined).
 - Use case: make variables defined in `CMakeLists.txt` available in source code (e.g. generated HEADER file).
 
+#### [`target_link_libraries(<target> ... <item>... ...)`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
+
+- Specify libraries or flags to use when linking a given target and/or its dependents.
+- `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
+
 #### [`target_include_directories(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_include_directories.html)
 
 - Specify where the executable target should look for include files.
-- `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
+- `<target>` must have been created by a command such as `add_executable()` or `add_library()`. `<target>` not have to be defined in the same directory as the `target_link_libraries` call.
+- `<item>` may be a library target name, a full path to a library file, a plain library name and so on. 
 
 ### Variables
 
@@ -84,6 +120,14 @@ Use `project(<project-name> VERSION <mayor>[.<minor>[.<patch>[.<tweak>]]])` to s
 #### [`CMAKE_CXX_STANDARD_REQUIRED`](https://cmake.org/cmake/help/latest/variable/CMAKE_CXX_STANDARD_REQUIRED.html)
 
 - Default value for `CXX_STANDARD_REQUIRED` target property if set when a target is created.
+
+#### [`PROJECT_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT_SOURCE_DIR.html)
+
+- Full path to source directory for project.
+
+#### [`PROJECT_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT_BINARY_DIR.html)
+
+- Full path to build directory for project.
 
 ### Properties
 
