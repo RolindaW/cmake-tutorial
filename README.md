@@ -37,7 +37,7 @@
 - Set project name (and other project level info e.g. language, version number).
 - Sets `PROJECT_NAME` variable.
 - Sets `CMAKE_PROJECT_NAME` variable when called from top-level `CMakeLists.txt`.
-- Sets other variables too (e.g. `PROJECT_SOURCE_DIR`, `PROJECT_BINARY_DIR`). Project build directory and project binary directory are considered interchangable terms.
+- Sets other variables too (e.g. `PROJECT_SOURCE_DIR`, `PROJECT_BINARY_DIR`). Project `build directory` and project `binary directory` are considered same.
 - Required with every project.
 - Should be called soon after `cmake_minimum_required()`.
 - Primarily intended for the top-level `CMakeLists.txt` file of a project. Not recommended to call in subdirectories for typical project structures (use `add_subdirectory()` - on top-level `CMakeLists.txt` file - and `add_executable()`,`add_library()`, `target_include_directories()` - within corresponding subdirectories `CmakeLists.txt` file - instead).
@@ -95,18 +95,24 @@ Other libraries:
 - `<input>` relative path is treated with respect to the value of `CMAKE_CURRENT_SOURCE_DIR`.
 - `<output>` relative path is treated with respect to the value of `CMAKE_CURRENT_BINARY_DIR`.
 - Variables referenced in the input file content as `@VAR@` (and other) will be replaced (empty string if not defined).
-- Use case: make variables defined in `CMakeLists.txt` available in source code (e.g. generated HEADER file).
+- Conventional and recommended location for the output is within the `build/binary directory`.
+- Use case: make variables defined in `CMakeLists.txt` file available in source code (e.g. generated cxx header file). Must be still specified with `target_include_directories()`.
 
 #### [`target_link_libraries(<target> ... <item>... ...)`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
 
 - Specify libraries or flags to use when linking a given target and/or its dependents.
 - `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
+- Corresponding header file source directory must be still specified with `target_include_directories()`.
+
+Note: added as a dependency in target project build system files (VS Build Tools `Link\AdditionalDependencies`).
 
 #### [`target_include_directories(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_include_directories.html)
 
 - Specify where the executable target should look for include files.
 - `<target>` must have been created by a command such as `add_executable()` or `add_library()`. `<target>` not have to be defined in the same directory as the `target_link_libraries` call.
 - `<item>` may be a library target name, a full path to a library file, a plain library name and so on. 
+
+Note: added as an include in target project build system files (VS Build Tools `AdditionalIncludeDirectories`).
 
 ### Variables
 
