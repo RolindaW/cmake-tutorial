@@ -81,22 +81,53 @@ Other libraries:
 - `<binary-dir>` directory in which to place output files. Path may be absolute or relative to the current output directory. Use `<source-dir>` value (before expanding any relative path) if not specified.
 - `CMakeLists.txt` file in specified `<source-dir>` will be processed immediately before continuing.
 
-#### [`set(<variable> <value>... [PARENT_SCOPE])`](https://cmake.org/cmake/help/latest/command/set.html)
+#### [`set(...)`](https://cmake.org/cmake/help/latest/command/set.html)
 
-- Set/Unset (if no value is given) a variable.
+- Set a `<variable>` to a given `<value>`.
+- CMake first searches for a normal variable when evaluating variable references, cached second.
 
-#### [`unset(<variable> [CACHE | PARENT_SCOPE])`](https://cmake.org/cmake/help/latest/command/unset.html)
+Normal: `set(<variable> <value>... [PARENT_SCOPE])`
+- Unset if no `<value>` is given (equivalent to `unset()`).
+- Use empty string `<value>` to clear a `<variable>` leaving it defined.
 
-- Unset a variable.
+Cache: `set(<variable> <value>... CACHE <type> <docstring> [FORCE])`
+- Do not override by default (require `FORCE` keyword).
+- `<type>` and `<docstring>` must be specified.
+
+Environment: `set(ENV{<variable>} [<value>])`
+
+#### [`unset(...)`](https://cmake.org/cmake/help/latest/command/unset.html)
+
+- Unset (i.e. remove) a `<variable>`.
+
+Normal & cache: `unset(<variable> [CACHE | PARENT_SCOPE])`
+Environment: `unset(ENV{<variable>})`
+
+
+#### [`option(<variable> "<help_text>" [value])`](https://cmake.org/cmake/help/latest/command/option.html)
+
+- Provide a boolean option that the user can optionally select.
+- Do nothing if `<variable>` already set (as either normal or cache variable).
+- Default to boolean `OFF` if no initial `<value> provided.
+
+#### [`if(<condition>)`](https://cmake.org/cmake/help/latest/command/if.html)
+
+- Execute a group of commands conditionally.
+- Use along `elseif(<condition>)`, `else()`, `endif()`.
 
 #### [`configure_file(<input> <output> ...)`](https://cmake.org/cmake/help/latest/command/configure_file.html)
 
 - Copy an `<input>` file to an `<output>` file while performing transformations of the input file content.
 - `<input>` relative path is treated with respect to the value of `CMAKE_CURRENT_SOURCE_DIR`.
 - `<output>` relative path is treated with respect to the value of `CMAKE_CURRENT_BINARY_DIR`.
-- Variables referenced in the input file content as `@VAR@` (and other) will be replaced (empty string if not defined).
+- Variables referenced in the input file content as `@VAR@`, `${VAR}`, `$CACHE{VAR}`, `$ENV{VAR}` will be replaced (empty string if not defined).
 - Conventional and recommended location for the output is within the `build/binary directory`.
 - Use case: make variables defined in `CMakeLists.txt` file available in source code (e.g. generated cxx header file). Must be still specified with `target_include_directories()`.
+
+#### [`target_sources(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_sources.html)
+
+- Add sources to a target.
+- `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
 
 #### [`target_link_libraries(<target> ... <item>... ...)`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
 
@@ -109,10 +140,15 @@ Note: added as a dependency in target project build system files (VS Build Tools
 #### [`target_include_directories(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_include_directories.html)
 
 - Specify where the executable target should look for include files.
-- `<target>` must have been created by a command such as `add_executable()` or `add_library()`. `<target>` not have to be defined in the same directory as the `target_link_libraries` call.
+- `<target>` must have been created by a command such as `add_executable()` or `add_library()`. `<target>` does not have to be defined in the same directory as the `target_link_libraries` call.
 - `<item>` may be a library target name, a full path to a library file, a plain library name and so on. 
 
 Note: added as an include in target project build system files (VS Build Tools `AdditionalIncludeDirectories`).
+
+#### [`target_compile_definitions(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_compile_definitions.html)
+
+- Add compile definitions (or symbols) to a target.
+- `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
 
 ### Variables
 
@@ -164,3 +200,10 @@ Using working directory as build tree and specifying source path:
 - Call the build system to compile/link the project (and others e.g. run test suite): `cmake --build <build-dir>` (or `cmake --build .` if already in the build directory).
 - Acts as a wrapper around the underlying native build tool, abstracting away the specifics of the chosen build system.
 - Re-runs build system file generation if needed (e.g. source files changed).
+
+#### Set/Override an option
+
+- `cmake -D<var>=<value> <src-path>` (or `cmake -D<var>=<value> .` if already in the `CMakeLists.txt` file directory).
+- Source tree must contain `CMakeLists.txt` file.
+- `-D` set a `cache variable` (or override its value if already exists).
+- Normal (non-cache) variable defined with `set()` without `CACHE` keyword cannot be overriden from command line.
