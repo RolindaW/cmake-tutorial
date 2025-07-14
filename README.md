@@ -75,7 +75,7 @@ Normal libraries:
 
 Other libraries:
   - [`OBJECT`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#object-libraries) Compile source files without archiving or linking their object files into a library. Other targets may reference the objects using the expression `$<TARGET_OBJECTS:obj-lib-name>` as source.
-  - [`INTERFACE`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#interface-libraries) 
+  - [`INTERFACE`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#interface-libraries) Specify usage requirements for dependents. Does not compile sources and does not produce a library artifact.
   - [`IMPORTED`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets) 
   - [`ALIAS`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#alias-targets) 
 
@@ -104,6 +104,15 @@ Note: added as an include in target project build system files (VS Build Tools `
 
 - Add compile definitions (or symbols) to a target.
 - `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
+
+### [`target_compile_options(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_compile_options.html)
+
+- Add compiler-specific options: optimization levels (`-O3`), warning flags (`-Wall`, `-Wextra`), debug symbols (`-g`), other.
+
+### [`target_compile_features(<target> <INTERFACE|PUBLIC|PRIVATE> <feature> ...)`](https://cmake.org/cmake/help/latest/command/target_compile_features.html)
+
+- Add modern C++ compiler features: C++ standard (`cxx_std_17`), variadic templates (`cxx_variadic_templates`), lambda expressions (`cxx_lambdas`), other.
+- CMake will automatically add necessary compiler flags to enable requested features if compiler supports them.
 
 ### [`configure_file(<input> <output> ...)`](https://cmake.org/cmake/help/latest/command/configure_file.html)
 
@@ -250,6 +259,6 @@ Primary commands:
 - `target_sources()`
 
 Keywords:
-- INTERFACE: Apply only to consumer targets.
+- INTERFACE: Apply only to consumer (dependent) targets.
 - PUBLIC: Apply to both producer and consumer targets.
 - PRIVATE: Apply only to producer target.
