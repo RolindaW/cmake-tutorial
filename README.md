@@ -79,24 +79,24 @@ Other libraries:
   - [`IMPORTED`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#imported-targets) 
   - [`ALIAS`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#alias-targets) 
 
+### [`target_link_libraries(<target> ... <item>... ...)`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
+
+- Specify libraries or flags to use when linking a given target and/or its dependents.
+- `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
+- It may still require to specify with `target_include_directories()` the source directory of being linked library header file (e.g. in `Step2` project, including `MathFunctions.h` header file source directory is required when linking `MathFunctions` library to `Tutorial` executable because the latter does not know where `MathFunctions.h` header file is; otherwise, including `mysqrt.h` header file source directory is not required when linking `SqrtLibrary` library to `MathFunctions` library because the latter does already know where `mysqrt.h` header file is). See `target usage requirements`.
+
+Note: added as a dependency in target project build system files (VS Build Tools `Link\AdditionalDependencies`).
+
 ### [`target_sources(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_sources.html)
 
 - Add sources to a target.
 - `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
 
-### [`target_link_libraries(<target> ... <item>... ...)`](https://cmake.org/cmake/help/latest/command/target_link_libraries.html)
-
-- Specify libraries or flags to use when linking a given target and/or its dependents.
-- `<target>` must have been created by a command such as `add_executable()` or `add_library()`.
-- It may still require to specify with `target_include_directories()` the source directory of being linked library header file (e.g. in `Step2` project, including `MathFunctions.h` header file source directory is required when linking `MathFunctions` library to `Tutorial` executable because the latter does not know where `MathFunctions.h` header file is; otherwise, including `mysqrt.h` header file source directory is not required when linking `SqrtLibrary` library to `MathFunctions` library because the latter does already know where `mysqrt.h` header file is).
-
-Note: added as a dependency in target project build system files (VS Build Tools `Link\AdditionalDependencies`).
-
 ### [`target_include_directories(<target> ... <INTERFACE|PUBLIC|PRIVATE> [items1...] ...)`](https://cmake.org/cmake/help/latest/command/target_include_directories.html)
 
 - Specify where the executable target should look for include files.
 - `<target>` must have been created by a command such as `add_executable()` or `add_library()`. `<target>` does not have to be defined in the same directory as the `target_link_libraries` call.
-- `<item>` may be a library target name, a full path to a library file, a plain library name and so on. 
+- `<item>` may be a library target name, a full path to a library file, a plain library name and so on.
 
 Note: added as an include in target project build system files (VS Build Tools `AdditionalIncludeDirectories`).
 
@@ -151,6 +151,7 @@ Environment: `unset(ENV{<variable>})`
 
 - It is possible to create variables for a project using `set()`.
 - There are some special variables automatically defined by CMake (those starting with `CMAKE_` - avoid this naming convention for custom variable names). May be set before calling `add_executable()` to take effect.
+- Reference/Dereference a variable: `${FOO}`.
 
 ### [`CMAKE_CXX_STANDARD`](https://cmake.org/cmake/help/latest/variable/CMAKE_CXX_STANDARD.html)
 
@@ -160,17 +161,41 @@ Environment: `unset(ENV{<variable>})`
 
 - Default value for `CXX_STANDARD_REQUIRED` target property if set when a target is created.
 
+### [`CMAKE_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_SOURCE_DIR.html)
+
+- Top-level `CMakeLists.txt` file source directory - Warning! Actually the one specified when `cmake` is initially invoked.
+- Remains constant through the entire execution.
+
+### [`CMAKE_CURRENT_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_CURRENT_SOURCE_DIR.html)
+
+- Currently being processed `CMakeLists.txt` file source directory.
+- Same value as `CMAKE_SOURCE_DIR` for top-level `CMakeLists.txt` file.
+- Value changes for each subdirectory `CMakeLists.txt` file (those added with `add_subdirectory()`).
+
 ### [`PROJECT_SOURCE_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT_SOURCE_DIR.html)
 
-- Full path to source directory for project.
+- Most recently defined project source directory in the current scope (i.e. keep parent project source directory while not processing any subproject - even while processing non-project subdirectory; take subproject source directory on processing and behave the same; restore parent project source directory when finish processing subproject).
+
+Side note: a subproject is a subdirectory (`add_subdirectory()`) that calls `project()`.
+
+### [`CMAKE_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_BINARY_DIR.html)
+
+- Top-level build directory (the one specified when `cmake` is initially invoked).
+- Associated to top-level `CMakeLists.txt` file - Warning! Actually the one specified when `cmake` is initially invoked.
+
+### [`CMAKE_CURRENT_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/CMAKE_CURRENT_BINARY_DIR.html)
+
+- Currently being processed `CMakeLists.txt` file binary directory.
+- Same value as `CMAKE_BINARY_DIR` for top-level `CMakeLists.txt` file.
+- Value changes for each subdirectory `CMakeLists.txt` file.
 
 ### [`PROJECT_BINARY_DIR`](https://cmake.org/cmake/help/latest/variable/PROJECT_BINARY_DIR.html)
 
-- Full path to build directory for project.
+- Most recently defined project binary directory in the current scope.
 
 ## Properties
 
-TODO
+Variables scoped to an object (e.g. a target).
 
 ### [`CXX_STANDARD`](https://cmake.org/cmake/help/latest/prop_tgt/CXX_STANDARD.html)
 
@@ -198,9 +223,33 @@ Using working directory as build tree and specifying source path:
 - Acts as a wrapper around the underlying native build tool, abstracting away the specifics of the chosen build system.
 - Re-runs build system file generation if needed (e.g. source files changed).
 
+Side note:
+- In-source build: place build artifacts within same directory as source code.
+- Out-of-source build: keep build artifacts separate from source code. Maintain cleaner source tree and allow multiple independent builds from same source code.
+
 ### Set/Override an option
 
 - `cmake -D<var>=<value> <src-path>` (or `cmake -D<var>=<value> .` if already in the `CMakeLists.txt` file directory).
 - Source tree must contain `CMakeLists.txt` file.
 - `-D` set a `cache variable` (or override its value if already exists).
 - Normal (non-cache) variable defined with `set()` without `CACHE` keyword cannot be overriden from command line.
+
+## [Target usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements)
+
+- Target settings that propagate to consumers/dependents (linked via `target_link_libraries()`) in order to correctly compile and link with it (i.e. `TargetB` target defines its own usage requirements which will be propagated to `TargetA` target when link with `target_link_libraries(TargetA ... TargetB)` - consumer target does not worry about any additional include or link directories).
+- Represented by transitive compile and link properties.
+- Modern CMake approach. Allow better control over a library/executable link and include line and over the transitive property of targets inside CMake.
+
+Primary commands:
+- `target_compile_definitions()`
+- `target_compile_options()`
+- `target_include_directories()`
+- `target_link_directories()`
+- `target_link_options()`
+- `target_precompile_headers()`
+- `target_sources()`
+
+Keywords:
+- INTERFACE: Apply only to consumer targets.
+- PUBLIC: Apply to both producer and consumer targets.
+- PRIVATE: Apply only to producer target.
