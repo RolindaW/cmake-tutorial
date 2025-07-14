@@ -262,3 +262,29 @@ Keywords:
 - INTERFACE: Apply only to consumer (dependent) targets.
 - PUBLIC: Apply to both producer and consumer targets.
 - PRIVATE: Apply only to producer target.
+
+## [`Generator expressions`](https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html)
+
+- What? Expression evaluated during build system files generation.
+- Why? Produce information specific to each [`build configuration`](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#build-configurations) (i.e. condition build system files generation).
+- When? Allowed in the context of many target properties (e.g. `LINK_LIBRARIES`, `INCLUDE_DIRECTORIES`, `COMPILE_DEFINITIONS`) and commands to populate those (e.g. `target_link_libraries()`, `target_include_directories()`, `target_compile_definitions()`).
+
+Main use case: enable conditional target usage requirements (e.g. linking, include directories, compile definitions/options/features) based on build configuration, platform information, target properties, other.
+
+### Usage
+
+- Syntax: `$<...>`.
+- Allow nesting (e.g. `$<FOO:$<BAR:BAZ>>`).
+- Surround it by qoutes when contains characters that may be interpreted as command argument separators (e.g. whitespaces, new lines, semicolons) to prevent it from being split.
+- Use helper variables to build up a readable expression.
+
+### Types
+
+Conditional expressions:
+- `$<condition:true_string>`: `true_string` if `1`; empty string if `0`; otherwise, error.
+  - `$<0:true_string>`: force empty string.
+  - `$<1:true_string>`: force `true_string`.
+- `$<IF:condition,true_string,false_string>`: `true_string` if `1`; `false_string` if `0`; otherwise, error.
+- `$<BOOL:string>`: convert (cast) `string` to `0` or `1` (no error).
+
+Other: logical operators, primary comparison expressions, string transformations, list expressions, path expressions, configuration expressions, toolchain and language expressions, target-dependent expressions, export and install expressions, multi-level expression evaluation, escaped characters.
