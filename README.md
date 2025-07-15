@@ -286,6 +286,10 @@ Warning! Not recommended invoking `cmake_install.cmake` file with `cmake -P <scr
 - `-D` set a `cache variable` (or override its value if already exists).
 - Normal (non-cache) variable defined with `set()` without `CACHE` keyword cannot be overriden from command line.
 
+## [`CTest`](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Testing%20With%20CMake%20and%20CTest.html)
+
+Test an already-built project - Warning! Project must have enabled testing.
+
 ## [Target usage requirements](https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html#target-usage-requirements)
 
 - Target settings that propagate to consumers/dependents (linked via `target_link_libraries()`) in order to correctly compile and link with it (i.e. `TargetB` target defines its own usage requirements which will be propagated to `TargetA` target when link with `target_link_libraries(TargetA ... TargetB)` - consumer target does not worry about any additional include or link directories).
