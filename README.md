@@ -151,10 +151,38 @@ Environment: `unset(ENV{<variable>})`
 - Do nothing if `<variable>` already set (as either normal or cache variable).
 - Default to boolean `OFF` if no initial `<value> provided.
 
+### [`list(...)`](https://cmake.org/cmake/help/latest/command/list.html)
+
+- Operate on semicolon-separated lists.
+- Operations: reading, search, modification, ordering.
+
+Modification:
+- `list(APPEND <list> [<element>...])`: append elements to `<list>`.
+
+Note: Create a list with `set()` command (e.g. call `set(<variable> Item1 Item2 ... ItemN)` to define `<variable>` with value `Item1;Item2;...;ItemN`).
+
 ### [`if(<condition>)`](https://cmake.org/cmake/help/latest/command/if.html)
 
 - Execute a group of commands conditionally.
 - Use along `elseif(<condition>)`, `else()`, `endif()`.
+
+### [`install(...)`](https://cmake.org/cmake/help/latest/command/install.html)
+
+- Specify rules to run at install time.
+- Install rules are executed in order during installation. Install rules in subdirectories are interleaved with those in parent directory.
+- Generates a `cmake_install.cmake` file inside each build/binary directory.
+
+There are `options` common to multiple signatures:
+- `DESTINATION <dir>`: directory to which a file will be installed.
+- Other: `PERMISSIONS`, `CONFIGURATIONS`, `COMPONENT`, `EXCLUDE_FROM_ALL`, `OPTIONAL`.
+
+Signatures:
+- `install(TARGETS <target>... [...])`: install target output artifacts and associated files.
+- `install({FILES | PROGRAMS} <file>... [...])`: install files or programs.
+- Other
+
+References:
+- [Mastering CMake - Installing Files](https://cmake.org/cmake/help/book/mastering-cmake/chapter/Install.html)
 
 ## Variables
 
@@ -202,6 +230,11 @@ Side note: a subproject is a subdirectory (`add_subdirectory()`) that calls `pro
 
 - Most recently defined project binary directory in the current scope.
 
+### [`CMAKE_INSTALL_PREFIX`](https://cmake.org/cmake/help/latest/variable/CMAKE_INSTALL_PREFIX.html)
+
+- Install directory used by `install()`.
+- Preprended onto all install directories (when using `cmake --install` or building `INSTALL`).
+
 ## Properties
 
 Variables scoped to an object (e.g. a target).
@@ -216,7 +249,7 @@ Variables scoped to an object (e.g. a target).
 
 ## [CMake](https://cmake.org/cmake/help/latest/manual/cmake.1.html)
 
-### Generate a project build system files
+### [`Generate` a project build system files](https://cmake.org/cmake/help/latest/manual/cmake.1.html#generate-a-project-buildsystem)
 
 Specifying source and build paths: `cmake -S <src-path> -B <build-path>`
 - Path may be absolute or relative to the current working directory.
@@ -226,7 +259,7 @@ Using working directory as build tree and specifying source path:
 - Create and navigate build directory: `mkdir <build-dir> && cd <build-dir>`
 - Configure the project and generate native build system files: `cmake ../<src-dir>`
 
-### Build a project
+### [`Build` a project](https://cmake.org/cmake/help/latest/manual/cmake.1.html#build-a-project)
 
 - Call the build system to compile/link the project (and others e.g. run test suite): `cmake --build <build-dir>` (or `cmake --build .` if already in the build directory).
 - Acts as a wrapper around the underlying native build tool, abstracting away the specifics of the chosen build system.
@@ -236,7 +269,17 @@ Side note:
 - In-source build: place build artifacts within same directory as source code.
 - Out-of-source build: keep build artifacts separate from source code. Maintain cleaner source tree and allow multiple independent builds from same source code.
 
-### Set/Override an option
+### [`Install` a project](https://cmake.org/cmake/help/latest/manual/cmake.1.html#install-a-project)
+
+- Install an already-built project: `cmake --install <build-dir> [<options>]`
+
+Options:
+- `--config <cfg>`: build configuration (useful for multi-generation generators).
+- `--prefix <dir>`: override `CMAKE_INSTALL_PREFIX`.
+
+Warning! Not recommended invoking `cmake_install.cmake` file with `cmake -P <script>`.
+
+### [`Set/Override` an option](https://cmake.org/cmake/help/latest/manual/cmake.1.html#run-a-script)
 
 - `cmake -D<var>=<value> <src-path>` (or `cmake -D<var>=<value> .` if already in the `CMakeLists.txt` file directory).
 - Source tree must contain `CMakeLists.txt` file.
@@ -288,3 +331,24 @@ Conditional expressions:
 - `$<BOOL:string>`: convert (cast) `string` to `0` or `1` (no error).
 
 Other: logical operators, primary comparison expressions, string transformations, list expressions, path expressions, configuration expressions, toolchain and language expressions, target-dependent expressions, export and install expressions, multi-level expression evaluation, escaped characters.
+
+## Build process
+
+Gathering and preparing the source code:
+- Retrieve necessary source code files (may be located in a version control or a local directory).
+- Preprocess the code (i.e. handle macros, conditional compilation, other language-specific features).
+
+Compiling the code:
+- Translate source code into machine-readable instructions (often in the form of object files).
+- May involve resolving dependencies on external libraries.
+
+Linking:
+- Link compiled object files together with necessary libraries to create an executable or library.
+- Resolve references between different parts of the code.
+
+Packaging and artifact creation:
+- Output a runable artifact.
+- May involve creating archives, installers or other formats for deployment.
+
+Testing and validation:
+- Run automated test to verify the software functions correctly.
